@@ -1,0 +1,26 @@
+```
+# Compiled Python files
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+server.log
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Dependencies
+.venv/
+venv/
+
+# Editors
+.vscode/
+.idea/
+
+# Build/dist directories
+build/
+dist/
+```

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ destination.name }} - 旅游指南</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">🌍 探索世界</a>
+            <ul class="nav-links">
+                <li><a href="/">首页</a></li>
+                <li><a href="/destinations">目的地</a></li>
+                <li><a href="/guides">攻略</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="destination-header">
+            <div class="placeholder-image large">{{ destination.name[0] }}</div>
+            <h1>{{ destination.name }}, {{ destination.country }}</h1>
+            <p class="description">{{ destination.description }}</p>
+        </section>
+
+        <section class="destination-info">
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>⭐ 评分</h3>
+                    <p>{{ destination.rating }}/5.0</p>
+                </div>
+                <div class="info-card">
+                    <h3>📅 最佳时间</h3>
+                    <p>{{ destination.best_time }}</p>
+                </div>
+                <div class="info-card">
+                    <h3>🏷️ 标签</h3>
+                    <div class="tags">
+                        {% for tag in destination.tags %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="travel-tips">
+            <h2>💡 旅行贴士</h2>
+            <ul class="tips-list">
+                {% for tip in destination.tips %}
+                <li>{{ tip }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        {% if guides %}
+        <section class="related-guides">
+            <h2>📝 相关攻略</h2>
+            <div class="guides-grid">
+                {% for guide in guides %}
+                <div class="guide-card">
+                    <h3>{{ guide.title }}</h3>
+                    <p class="guide-author">by {{ guide.author }} | {{ guide.date }}</p>
+                    <p class="guide-content">{{ guide.content }}</p>
+                    <div class="guide-meta">
+                        <span>👍 {{ guide.likes }} 点赞</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <div class="back-link">
+            <a href="/destinations" class="btn btn-outline">← 返回目的地列表</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 探索世界旅游指南。让每一次旅行都难忘。</p>
+        </div>
+    </footer>
+</body>
+</html>

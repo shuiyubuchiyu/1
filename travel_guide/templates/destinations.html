@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>目的地 - 旅游指南</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">🌍 探索世界</a>
+            <ul class="nav-links">
+                <li><a href="/">首页</a></li>
+                <li><a href="/destinations">目的地</a></li>
+                <li><a href="/guides">攻略</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="page-header">
+            <h1>所有目的地</h1>
+            <p>探索世界各地的精彩</p>
+        </section>
+
+        <section class="filters">
+            <h3>按类别筛选：</h3>
+            <div class="filter-buttons">
+                <a href="/destinations" class="btn {% if not request.args.get('category') %}btn-active{% endif %}">全部</a>
+                {% for category in categories %}
+                <a href="/destinations?category={{ category }}" class="btn {% if request.args.get('category') == category %}btn-active{% endif %}">{{ category }}</a>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="destination-grid">
+            {% for dest in destinations %}
+            <div class="destination-card">
+                <div class="card-image">
+                    <div class="placeholder-image">{{ dest.name[0] }}</div>
+                </div>
+                <div class="card-content">
+                    <h3>{{ dest.name }}, {{ dest.country }}</h3>
+                    <p>{{ dest.description }}</p>
+                    <div class="card-meta">
+                        <span class="rating">⭐ {{ dest.rating }}</span>
+                        <span class="best-time">📅 {{ dest.best_time }}</span>
+                    </div>
+                    <div class="tags">
+                        {% for tag in dest.tags %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    <a href="/destination/{{ dest.id }}" class="btn">查看详情</a>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        {% if not destinations %}
+        <div class="no-results">
+            <p>暂无符合条件的目的地</p>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 探索世界旅游指南。让每一次旅行都难忘。</p>
+        </div>
+    </footer>
+</body>
+</html>
