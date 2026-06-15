@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探索世界 - 旅游指南</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">🌍 探索世界</a>
+            <ul class="nav-links">
+                <li><a href="/">首页</a></li>
+                <li><a href="/destinations">目的地</a></li>
+                <li><a href="/guides">攻略</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>发现你的下一个目的地</h1>
+            <p>探索世界各地的美景，规划完美旅程</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索目的地、国家或标签...">
+                <button onclick="searchDestinations()">搜索</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="featured">
+            <h2>热门目的地</h2>
+            <div class="destination-grid">
+                {% for dest in destinations %}
+                <div class="destination-card" data-name="{{ dest.name }}" data-country="{{ dest.country }}" data-tags="{{ dest.tags | join(',') }}">
+                    <div class="card-image">
+                        <div class="placeholder-image">{{ dest.name[0] }}</div>
+                    </div>
+                    <div class="card-content">
+                        <h3>{{ dest.name }}, {{ dest.country }}</h3>
+                        <p>{{ dest.description }}</p>
+                        <div class="card-meta">
+                            <span class="rating">⭐ {{ dest.rating }}</span>
+                            <span class="best-time">📅 {{ dest.best_time }}</span>
+                        </div>
+                        <div class="tags">
+                            {% for tag in dest.tags %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        <a href="/destination/{{ dest.id }}" class="btn">查看详情</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="view-all">
+                <a href="/destinations" class="btn btn-outline">查看全部目的地</a>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>为什么选择我们</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">📝</div>
+                    <h3>详细攻略</h3>
+                    <p>提供全面的旅行攻略和实用建议</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <h3>精准推荐</h3>
+                    <p>根据你的兴趣推荐最适合的目的地</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💡</div>
+                    <h3>实用贴士</h3>
+                    <p>当地文化、交通、美食等全方位信息</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 探索世界旅游指南。让每一次旅行都难忘。</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

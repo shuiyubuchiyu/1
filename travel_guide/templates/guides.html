@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅游攻略 - 旅游指南</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">🌍 探索世界</a>
+            <ul class="nav-links">
+                <li><a href="/">首页</a></li>
+                <li><a href="/destinations">目的地</a></li>
+                <li><a href="/guides">攻略</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="page-header">
+            <h1>旅游攻略</h1>
+            <p>来自旅行达人的实战经验分享</p>
+        </section>
+
+        <section class="guides-list">
+            {% for guide in guides %}
+            <div class="guide-card-large">
+                <div class="guide-content-large">
+                    <h2>{{ guide.title }}</h2>
+                    <p class="guide-meta">
+                        <span>作者：{{ guide.author }}</span>
+                        <span>发布日期：{{ guide.date }}</span>
+                        <span>👍 {{ guide.likes }} 点赞</span>
+                    </p>
+                    <p class="guide-preview">{{ guide.content }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 探索世界旅游指南。让每一次旅行都难忘。</p>
+        </div>
+    </footer>
+</body>
+</html>
