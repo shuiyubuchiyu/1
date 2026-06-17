@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国象棋 - 局域网联机</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .room-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .room-input input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .room-input button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .room-input button:hover {
+            background: #5568d3;
+        }
+
+        .board {
+            position: relative;
+            width: 450px;
+            height: 500px;
+            background: #f0d9b5;
+            border: 3px solid #8b4513;
+        }
+
+        .grid {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 400px;
+            height: 450px;
+        }
+
+        .grid line {
+            stroke: #8b4513;
+            stroke-width: 1;
+        }
+
+        .cell {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .cell:hover {
+            background-color: rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+        }
+
+        .cell.selected {
+            background-color: rgba(102, 126, 234, 0.5);
+            border-radius: 50%;
+        }
+
+        .piece {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .piece:hover {
+            transform: scale(1.1);
+        }
+
+        .piece.red {
+            background: #ffcccc;
+            color: #cc0000;
+            border: 2px solid #cc0000;
+        }
+
+        .piece.black {
+            background: #cccccc;
+            color: #000000;
+            border: 2px solid #000000;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .current-player {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .message {
+            color: #666;
+        }
+
+        .waiting {
+            color: #ff9800;
+        }
+
+        .game-over {
+            color: #e74c3c;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏮 中国象棋 🏮</h1>
+    
+    <div class="game-container">
+        <div class="room-input" id="roomInput">
+            <input type="text" id="roomId" placeholder="输入房间号（如：room1）" value="room1">
+            <button onclick="joinRoom()">加入游戏</button>
+        </div>
+
+        <div class="board" id="board" style="display: none;">
+            <svg class="grid" viewBox="0 0 400 450">
+                <!-- 横线 -->
+                <line x1="0" y1="0" x2="400" y2="0"/>
+                <line x1="0" y1="50" x2="400" y2="50"/>
+                <line x1="0" y1="100" x2="400" y2="100"/>
+                <line x1="0" y1="150" x2="400" y2="150"/>
+                <line x1="0" y1="200" x2="400" y2="200"/>
+                <line x1="0" y1="250" x2="400" y2="250"/>
+                <line x1="0" y1="300" x2="400" y2="300"/>
+                <line x1="0" y1="350" x2="400" y2="350"/>
+                <line x1="0" y1="400" x2="400" y2="400"/>
+                <line x1="0" y1="450" x2="400" y2="450"/>
+                
+                <!-- 竖线 -->
+                <line x1="0" y1="0" x2="0" y2="200"/>
+                <line x1="50" y1="0" x2="50" y2="200"/>
+                <line x1="100" y1="0" x2="100" y2="200"/>
+                <line x1="150" y1="0" x2="150" y2="200"/>
+                <line x1="200" y1="0" x2="200" y2="200"/>
+                <line x1="250" y1="0" x2="250" y2="200"/>
+                <line x1="300" y1="0" x2="300" y2="200"/>
+                <line x1="350" y1="0" x2="350" y2="200"/>
+                <line x1="400" y1="0" x2="400" y2="200"/>
+                
+                <line x1="0" y1="250" x2="0" y2="450"/>
+                <line x1="50" y1="250" x2="50" y2="450"/>
+                <line x1="100" y1="250" x2="100" y2="450"/>
+                <line x1="150" y1="250" x2="150" y2="450"/>
+                <line x1="200" y1="250" x2="200" y2="450"/>
+                <line x1="250" y1="250" x2="250" y2="450"/>
+                <line x1="300" y1="250" x2="300" y2="450"/>
+                <line x1="350" y1="250" x2="350" y2="450"/>
+                <line x1="400" y1="250" x2="400" y2="450"/>
+                
+                <!-- 楚河汉界 -->
+                <line x1="0" y1="200" x2="400" y2="200"/>
+                <line x1="0" y1="250" x2="400" y2="250"/>
+                
+                <!-- 九宫格斜线 -->
+                <line x1="100" y1="0" x2="200" y2="100"/>
+                <line x1="200" y1="0" x2="100" y2="100"/>
+                <line x1="100" y1="350" x2="200" y2="450"/>
+                <line x1="200" y1="350" x2="100" y2="450"/>
+            </svg>
+            
+            <div id="cells"></div>
+        </div>
+
+        <div class="status" id="status" style="display: none;">
+            <div class="current-player" id="currentPlayer"></div>
+            <div class="message" id="message"></div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let myColor = null;
+        let selectedPiece = null;
+        let board = [];
+        let currentPlayer = null;
+
+        // 棋子汉字映射
+        const pieceChars = {
+            red: {
+                ju: '车', ma: '马', xiang: '相', shi: '仕',
+                shuai: '帅', pao: '炮', bing: '兵'
+            },
+            black: {
+                ju: '车', ma: '马', xiang: '象', shi: '士',
+                jiang: '将', pao: '炮', zu: '卒'
+            }
+        };
+
+        function joinRoom() {
+            const roomId = document.getElementById('roomId').value.trim();
+            if (!roomId) {
+                alert('请输入房间号');
+                return;
+            }
+            
+            socket.emit('joinRoom', roomId);
+            document.getElementById('roomInput').style.display = 'none';
+            document.getElementById('board').style.display = 'block';
+            document.getElementById('status').style.display = 'block';
+            updateMessage('等待其他玩家加入...', 'waiting');
+        }
+
+        function initBoard() {
+            const cellsContainer = document.getElementById('cells');
+            cellsContainer.innerHTML = '';
+            
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 9; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.style.left = (col * 50) + 'px';
+                    cell.style.top = (row * 50) + 'px';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.onclick = () => handleCellClick(row, col);
+                    cellsContainer.appendChild(cell);
+                }
+            }
+            
+            renderBoard();
+        }
+
+        function renderBoard() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                const row = parseInt(cell.dataset.row);
+                const col = parseInt(cell.dataset.col);
+                const piece = board[row][col];
+                
+                cell.innerHTML = '';
+                cell.classList.remove('selected');
+                
+                if (piece) {
+                    const pieceDiv = document.createElement('div');
+                    pieceDiv.className = `piece ${piece.color}`;
+                    pieceDiv.textContent = pieceChars[piece.color][piece.type];
+                    cell.appendChild(pieceDiv);
+                }
+            });
+        }
+
+        function handleCellClick(row, col) {
+            if (!myColor || !currentPlayer || currentPlayer !== myColor) {
+                return;
+            }
+            
+            const piece = board[row][col];
+            
+            // 如果已经选中了棋子
+            if (selectedPiece) {
+                // 点击的是同一个位置，取消选择
+                if (selectedPiece.row === row && selectedPiece.col === col) {
+                    selectedPiece = null;
+                    renderBoard();
+                    return;
+                }
+                
+                // 点击的是自己的另一个棋子，重新选择
+                if (piece && piece.color === myColor) {
+                    selectedPiece = { row, col };
+                    renderBoard();
+                    document.querySelector(`[data-row="${row}"][data-col="${col}"]`).classList.add('selected');
+                    return;
+                }
+                
+                // 移动到空位或吃子
+                socket.emit('movePiece', {
+                    from: selectedPiece,
+                    to: { row, col }
+                });
+                selectedPiece = null;
+            } else {
+                // 选择棋子
+                if (piece && piece.color === myColor) {
+                    selectedPiece = { row, col };
+                    renderBoard();
+                    document.querySelector(`[data-row="${row}"][data-col="${col}"]`).classList.add('selected');
+                }
+            }
+        }
+
+        function updateCurrentPlayer(player) {
+            currentPlayer = player;
+            const playerText = player === 'red' ? '红方' : '黑方';
+            const myText = myColor === 'red' ? '红方' : '黑方';
+            
+            if (player === myColor) {
+                document.getElementById('currentPlayer').innerHTML = 
+                    `<span style="color: #27ae60;">✅ 你的回合 (${myText})</span>`;
+                updateMessage('请移动你的棋子');
+            } else {
+                document.getElementById('currentPlayer').innerHTML = 
+                    `<span style="color: #e74c3c;">⏳ 对方回合 (${playerText})</span>`;
+                updateMessage('等待对方移动...');
+            }
+        }
+
+        function updateMessage(text, className = 'message') {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = className;
+        }
+
+        // Socket 事件处理
+        socket.on('gameInit', (data) => {
+            myColor = data.color;
+            board = data.board;
+            currentPlayer = data.currentPlayer;
+            initBoard();
+            
+            const myText = myColor === 'red' ? '红方' : '黑方';
+            updateMessage(`你执${myText}，等待对手加入...`, 'waiting');
+        });
+
+        socket.on('gameStart', (data) => {
+            board = data.board;
+            currentPlayer = data.currentPlayer;
+            renderBoard();
+            updateCurrentPlayer(currentPlayer);
+        });
+
+        socket.on('pieceMoved', (data) => {
+            board = data.board;
+            currentPlayer = data.currentPlayer;
+            renderBoard();
+            updateCurrentPlayer(currentPlayer);
+        });
+
+        socket.on('gameOver', (data) => {
+            const winnerText = data.winner === 'red' ? '红方' : '黑方';
+            const result = data.winner === myColor ? '🎉 你赢了！' : '😔 你输了！';
+            updateMessage(`${result} (${winnerText}获胜)`, 'game-over');
+        });
+
+        socket.on('playerLeft', (playerId) => {
+            updateMessage('对手已离开游戏', 'waiting');
+        });
+
+        socket.on('roomFull', (msg) => {
+            alert(msg);
+            document.getElementById('roomInput').style.display = 'flex';
+            document.getElementById('board').style.display = 'none';
+            document.getElementById('status').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
